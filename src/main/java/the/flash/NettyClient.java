@@ -30,8 +30,11 @@ public class NettyClient {
                 // 绑定自定义属性到 channel
                 .attr(AttributeKey.newInstance("clientName"), "nettyClient")
                 // 设置TCP底层属性
+                //连接超时时间
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                //开启心跳保活
                 .option(ChannelOption.SO_KEEPALIVE, true)
+                //关闭Nagle算法 高实时性，有数据马上发送
                 .option(ChannelOption.TCP_NODELAY, true)
                 // 3.IO 处理逻辑
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -41,7 +44,7 @@ public class NettyClient {
                 });
 
         // 4.建立连接
-        connect(bootstrap, "juejin.im", 80, MAX_RETRY);
+        connect(bootstrap, "127.0.0.1", 8080, MAX_RETRY);
     }
 
     private static void connect(Bootstrap bootstrap, String host, int port, int retry) {
