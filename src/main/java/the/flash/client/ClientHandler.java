@@ -21,26 +21,27 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) {
         System.out.println(new Date() + ": 客户端开始登录");
 
-        // 创建登录对象
+        // step 1 创建登录对象 指定登录指令，构建登录数据
         LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
         loginRequestPacket.setUserId(UUID.randomUUID().toString());
         loginRequestPacket.setUsername("flash");
         loginRequestPacket.setPassword("pwd");
 
-        // 编码
+        // step2 编码
         ByteBuf buffer = PacketCodeC.INSTANCE.encode(ctx.alloc(), loginRequestPacket);
 
-        // 写数据
+        //step3 写数据
         ctx.channel().writeAndFlush(buffer);
     }
 
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        //step 10 接收buf
         ByteBuf byteBuf = (ByteBuf) msg;
-
+        //step 11 解码 成登录数据
         Packet packet = PacketCodeC.INSTANCE.decode(byteBuf);
-
+        //step 12 处理登陆响应
         if (packet instanceof LoginResponsePacket) {
             LoginResponsePacket loginResponsePacket = (LoginResponsePacket) packet;
 

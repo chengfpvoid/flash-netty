@@ -7,7 +7,7 @@ import the.flash.serialize.SerializerAlogrithm;
 public class JSONSerializer implements Serializer {
 
     @Override
-    public byte getSerializerAlogrithm() {
+    public byte getSerializerAlgorithm() {
         return SerializerAlogrithm.JSON;
     }
 

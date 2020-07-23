@@ -13,6 +13,10 @@ import java.util.Map;
 import static the.flash.protocol.command.Command.LOGIN_REQUEST;
 import static the.flash.protocol.command.Command.LOGIN_RESPONSE;
 
+/**
+ * 通信协议包括
+ * 4byte魔数  1byte 版本号  序列化算法 1 byte  指令 1byte 数据长度 4byte  数据N字节
+ */
 public class PacketCodeC {
 
     private static final int MAGIC_NUMBER = 0x12345678;
@@ -29,7 +33,7 @@ public class PacketCodeC {
 
         serializerMap = new HashMap<>();
         Serializer serializer = new JSONSerializer();
-        serializerMap.put(serializer.getSerializerAlogrithm(), serializer);
+        serializerMap.put(serializer.getSerializerAlgorithm(), serializer);
     }
 
 
@@ -40,11 +44,17 @@ public class PacketCodeC {
         byte[] bytes = Serializer.DEFAULT.serialize(packet);
 
         // 3. 实际编码过程
+        //写入魔数
         byteBuf.writeInt(MAGIC_NUMBER);
+        //写入版本号
         byteBuf.writeByte(packet.getVersion());
-        byteBuf.writeByte(Serializer.DEFAULT.getSerializerAlogrithm());
+        //写入序列化算法
+        byteBuf.writeByte(Serializer.DEFAULT.getSerializerAlgorithm());
+        //写入数据包的指令
         byteBuf.writeByte(packet.getCommand());
+        //写入数据长度 字节数
         byteBuf.writeInt(bytes.length);
+        //写入数据
         byteBuf.writeBytes(bytes);
 
         return byteBuf;
@@ -69,10 +79,11 @@ public class PacketCodeC {
 
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);
-
+        //根据指定 获取到包类型
         Class<? extends Packet> requestType = getRequestType(command);
+        //得到序列化器
         Serializer serializer = getSerializer(serializeAlgorithm);
-
+        //反序列化
         if (requestType != null && serializer != null) {
             return serializer.deserialize(requestType, bytes);
         }
